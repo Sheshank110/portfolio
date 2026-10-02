@@ -7,6 +7,7 @@ import portfolio from '../data/portfolio';
 const NAV_LINKS = [
   { id: 'about', label: 'CORE // ABOUT' },
   { id: 'dossier', label: 'DOSSIER' },
+  { id: 'transit', label: 'TRANSIT' },
   { id: 'contact', label: 'CONTACT' },
 ];
 

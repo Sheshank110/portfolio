@@ -4,6 +4,7 @@ import MarqueeBanner from '../components/MarqueeBanner';
 import Hero from '../sections/Hero';
 import About from '../sections/About';
 import Dossier from '../sections/Dossier';
+import WormholeTransit from '../sections/WormholeTransit';
 import Contact from '../sections/Contact';
 
 export default function Home() {
@@ -32,6 +33,9 @@ export default function Home() {
 
         {/* Section 03: Technical Arsenal & Verified Credentials Vault */}
         <Dossier />
+
+        {/* Section 03.5: Event Horizon Wormhole & Chrono-Transit */}
+        <WormholeTransit />
 
         {/* Section 04: Let's Build Something (Contact) */}
         <Contact />
