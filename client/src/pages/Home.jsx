@@ -3,12 +3,7 @@ import Footer from '../components/Footer';
 import MarqueeBanner from '../components/MarqueeBanner';
 import Hero from '../sections/Hero';
 import About from '../sections/About';
-import Skills from '../sections/Skills';
-import FeaturedProject from '../sections/FeaturedProject';
-import Projects from '../sections/Projects';
-import Journey from '../sections/Journey';
-import Achievements from '../sections/Achievements';
-import GitHub from '../sections/GitHub';
+import Dossier from '../sections/Dossier';
 import Contact from '../sections/Contact';
 
 export default function Home() {
@@ -16,9 +11,10 @@ export default function Home() {
     <>
       <Navbar />
       <main>
+        {/* Section 01: Hero */}
         <Hero />
 
-        {/* Growkool-style running editorial ticker between Hero and About */}
+        {/* Editorial ticker between Hero and About */}
         <MarqueeBanner
           items={[
             'FULL-STACK ARCHITECTURE',
@@ -31,28 +27,13 @@ export default function Home() {
           speed="normal"
         />
 
+        {/* Section 02: Cybercore Specification & Interactive Project Graph */}
         <About />
-        <Skills />
-        <FeaturedProject />
-        <Projects />
 
-        {/* Second opposing running ribbon between Projects and Journey */}
-        <MarqueeBanner
-          items={[
-            'REACT.JS & NODE.JS',
-            'RESTFUL APIS',
-            'MONGODB & MYSQL',
-            'OBJECT-ORIENTED DESIGN',
-            'GENAI FOUNDATIONS',
-            'HIGH PERFORMANCE WEB',
-          ]}
-          direction="right"
-          speed="slow"
-        />
+        {/* Section 03: Technical Arsenal & Verified Credentials Vault */}
+        <Dossier />
 
-        <Journey />
-        <Achievements />
-        <GitHub />
+        {/* Section 04: Let's Build Something (Contact) */}
         <Contact />
       </main>
       <Footer />

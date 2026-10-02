@@ -141,7 +141,7 @@ export default function Contact() {
       <div className="section-container">
         {/* Growkool 06 Header */}
         <div className="flex items-center gap-4 mb-4">
-          <span className="font-mono text-sm tracking-wider text-accent font-bold">06</span>
+          <span className="font-mono text-sm tracking-wider text-accent font-bold">04</span>
           <span className="font-heading font-bold text-xs tracking-[0.2em] uppercase text-text-secondary">
             START A PROJECT / HIRE
           </span>
