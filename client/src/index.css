@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700;800;900&family=Syne:wght@700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700;800;900&family=Syne:wght@700;800;900&display=swap');
 @import "tailwindcss";
 
 /* ========================================
@@ -22,6 +22,7 @@
   --color-error: #e11d27;
   --color-success: #16a34a;
 
+  --font-hero: 'Bebas Neue', 'Space Grotesk', system-ui, sans-serif;
   --font-heading: 'Space Grotesk', 'Syne', system-ui, sans-serif;
   --font-body: 'Inter', system-ui, sans-serif;
   --font-mono: 'SF Mono', 'Fira Code', monospace;
@@ -506,5 +507,74 @@ a {
 
 .nav-logo-hero {
   color: #ffffff !important;
+}
+
+/* ========================================
+   Hero Section Cinematic Utilities
+   ======================================== */
+.font-hero {
+  font-family: var(--font-hero);
+}
+
+.hero-name-solid {
+  font-family: var(--font-hero);
+  color: #ffffff;
+  letter-spacing: 0.01em;
+  line-height: 0.86;
+  text-shadow: 0 0 35px rgba(255, 255, 255, 0.25), 0 0 70px rgba(225, 29, 39, 0.45);
+}
+
+.hero-name-stroke {
+  font-family: var(--font-hero);
+  -webkit-text-stroke: 2.2px var(--color-accent);
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  letter-spacing: 0.01em;
+  line-height: 0.86;
+  filter: drop-shadow(0 0 16px rgba(225, 29, 39, 0.65));
+}
+
+@media (max-width: 640px) {
+  .hero-name-stroke {
+    -webkit-text-stroke-width: 1.5px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .hero-name-stroke {
+    -webkit-text-stroke-width: 2.6px;
+  }
+}
+
+/* Horizontal Laser Glow Animation */
+@keyframes hero-laser-pulse {
+  0%, 100% {
+    opacity: 0.85;
+    filter: drop-shadow(0 0 12px rgba(255, 40, 60, 0.75));
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 24px rgba(255, 80, 100, 0.95)) drop-shadow(0 0 50px rgba(225, 29, 39, 0.8));
+  }
+}
+
+.hero-laser-beam {
+  animation: hero-laser-pulse 4s ease-in-out infinite;
+}
+
+/* Red Ambient Pulse */
+@keyframes hero-ambient-breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.45;
+  }
+  50% {
+    transform: scale(1.08);
+    opacity: 0.65;
+  }
+}
+
+.hero-ambient-glow {
+  animation: hero-ambient-breathe 6s ease-in-out infinite;
 }
 
