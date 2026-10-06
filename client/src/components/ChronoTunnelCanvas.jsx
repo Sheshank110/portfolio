@@ -172,81 +172,6 @@ export default function ChronoTunnelCanvas({
     return texture;
   }, []);
 
-  // Helper to generate sleek monochrome 3D Billboard sprites (pure space contrast)
-  const createGateBillboard = useCallback((milestone) => {
-    const width = 1024;
-    const height = 512;
-    const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
-    const ctx = canvas.getContext('2d');
-
-    ctx.clearRect(0, 0, width, height);
-
-    // Deep black semi-transparent backdrop fill
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.88)';
-    ctx.fillRect(36, 36, width - 72, height - 72);
-
-    // Razor-sharp white hairline border
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(36, 36, width - 72, height - 72);
-
-    // Corner targeting brackets
-    const len = 24;
-    ctx.lineWidth = 4;
-    ctx.strokeStyle = '#ffffff';
-    ctx.beginPath();
-    // Top-left
-    ctx.moveTo(34, 34 + len); ctx.lineTo(34, 34); ctx.lineTo(34 + len, 34);
-    // Top-right
-    ctx.moveTo(width - 34 - len, 34); ctx.lineTo(width - 34, 34); ctx.lineTo(width - 34, 34 + len);
-    // Bottom-left
-    ctx.moveTo(34, height - 34 - len); ctx.lineTo(34, height - 34); ctx.lineTo(34 + len, height - 34);
-    // Bottom-right
-    ctx.moveTo(width - 34 - len, height - 34); ctx.lineTo(width - 34, height - 34); ctx.lineTo(width - 34, height - 34 - len);
-    ctx.stroke();
-
-    // Gate Index & Protocol tag
-    ctx.font = 'bold 24px "SF Mono", "Fira Code", monospace';
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
-    ctx.fillText(`GATE ${milestone.gateIndex} // ${milestone.type}`, 68, 92);
-
-    // Giant Year (pure starlight white)
-    ctx.font = '900 112px "Space Grotesk", "Syne", sans-serif';
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(milestone.year, 68, 205);
-
-    // Title
-    ctx.font = 'bold 34px "Space Grotesk", sans-serif';
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-    ctx.fillText(milestone.title.toUpperCase(), 68, 270);
-
-    // Organization & Metric
-    ctx.font = '500 26px "Space Grotesk", sans-serif';
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-    ctx.fillText(`▶ ${milestone.org}`, 68, 325);
-
-    // Telemetry footer
-    ctx.font = '20px "SF Mono", monospace';
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-    ctx.fillText(`${milestone.coords} • STATUS: VERIFIED`, 68, 420);
-
-    const texture = new THREE.CanvasTexture(canvas);
-    texture.minFilter = THREE.LinearFilter;
-    const material = new THREE.MeshBasicMaterial({
-      map: texture,
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-      blending: THREE.NormalBlending,
-    });
-
-    const geometry = new THREE.PlaneGeometry(160, 80);
-    const mesh = new THREE.Mesh(geometry, material);
-    return { mesh, texture };
-  }, []);
-
   // ─── Initialize Three.js Scene ONCE on mount ─────────────────────────────
   useEffect(() => {
     const container = containerRef.current;
@@ -384,9 +309,8 @@ export default function ChronoTunnelCanvas({
     }
     scene.add(ringsGroup);
 
-    // ─── 5. Floating 3D Milestone Gates (Monochrome Billboards) ──────────────
+    // ─── 5. Floating 3D Milestone Waypoint Beacons (Subtle Rings & Cores) ──────
     const milestoneGates = [];
-    const texturesToDispose = [];
 
     CHRONO_MILESTONES.forEach((ms, idx) => {
       const gateGroup = new THREE.Group();
@@ -396,13 +320,13 @@ export default function ChronoTunnelCanvas({
       const xOffset = isLeft ? -28 : 28;
       const yOffset = ((idx % 3) - 1) * 8;
 
-      // Outer subtle white portal ring
-      const portalRingGeo = new THREE.RingGeometry(22, 23.5, 36);
+      // Outer subtle white portal ring (compact)
+      const portalRingGeo = new THREE.RingGeometry(13, 14, 32);
       const portalRingMat = new THREE.MeshBasicMaterial({
         color: 0xffffff,
         side: THREE.DoubleSide,
         transparent: true,
-        opacity: 0.25,
+        opacity: 0.22,
         blending: THREE.AdditiveBlending,
       });
       const portalRing = new THREE.Mesh(portalRingGeo, portalRingMat);
@@ -410,7 +334,7 @@ export default function ChronoTunnelCanvas({
       gateGroup.add(portalRing);
 
       // Central white star core
-      const coreGeo = new THREE.SphereGeometry(1.5, 12, 12);
+      const coreGeo = new THREE.SphereGeometry(1.0, 10, 10);
       const coreMat = new THREE.MeshBasicMaterial({
         color: 0xffffff,
         wireframe: true,
@@ -419,16 +343,9 @@ export default function ChronoTunnelCanvas({
       coreMesh.position.set(xOffset, yOffset, 0);
       gateGroup.add(coreMesh);
 
-      // 3D Billboard Sprite
-      const { mesh: billboardMesh, texture } = createGateBillboard(ms);
-      billboardMesh.position.set(xOffset, yOffset + 24, 0);
-      gateGroup.add(billboardMesh);
-      texturesToDispose.push(texture);
-
       scene.add(gateGroup);
       milestoneGates.push({
         group: gateGroup,
-        billboard: billboardMesh,
         portalRing,
         coreMesh,
         z: ms.z,
@@ -517,7 +434,7 @@ export default function ChronoTunnelCanvas({
         ring.rotation.z = elapsedTime * 0.08 * (i % 2 === 0 ? 1 : -1);
       });
 
-      // ─── Proximity & Billboard Orientation ──────────────────────────────
+      // ─── Proximity & Beacon Fading ────────────────────────────────────────
       let closestDistance = Infinity;
       let closestIndex = -1;
 
@@ -525,8 +442,7 @@ export default function ChronoTunnelCanvas({
         const dist = gate.z - camera.position.z;
         const absDist = Math.abs(dist);
 
-        // Turn billboards to face the camera smoothly
-        gate.billboard.quaternion.copy(camera.quaternion);
+        // Turn portal rings to face the camera smoothly
         gate.portalRing.quaternion.copy(camera.quaternion);
         gate.portalRing.rotation.z = elapsedTime * 0.4;
 
@@ -534,8 +450,7 @@ export default function ChronoTunnelCanvas({
         if (absDist < 650) {
           gate.group.visible = true;
           const normalizedDist = Math.max(0, 1 - absDist / 600);
-          gate.billboard.material.opacity = Math.min(1.0, normalizedDist * 1.4);
-          gate.portalRing.material.opacity = Math.min(0.65, normalizedDist * 1.1);
+          gate.portalRing.material.opacity = Math.min(0.45, normalizedDist * 0.7);
 
           const scale = 1.0 + Math.sin(elapsedTime * 2 + gate.index) * 0.04;
           gate.coreMesh.scale.set(scale, scale, scale);
@@ -579,19 +494,16 @@ export default function ChronoTunnelCanvas({
       ringGeometry.dispose();
       ringMaterial.dispose();
 
-      texturesToDispose.forEach((t) => t.dispose());
       milestoneGates.forEach((g) => {
         g.portalRing.geometry.dispose();
         g.portalRing.material.dispose();
         g.coreMesh.geometry.dispose();
         g.coreMesh.material.dispose();
-        g.billboard.geometry.dispose();
-        g.billboard.material.dispose();
       });
 
       renderer.dispose();
     };
-  }, [createPinpointStarTexture, createGateBillboard]); // Empty dependencies: runs once!
+  }, [createPinpointStarTexture]); // Empty dependencies: runs once!
 
   return (
     <div ref={containerRef} className="relative w-full h-full bg-black">

@@ -198,7 +198,7 @@ export default function PhysicsTextSandbox() {
             const dx = b.position.x - mPos.x;
             const dy = b.position.y - mPos.y;
             const dist = Math.hypot(dx, dy);
-            const repelRadius = 85;
+            const repelRadius = 40;
 
             if (dist < repelRadius && dist > 1) {
               const force = (1 - dist / repelRadius) * 0.0035;
@@ -261,14 +261,14 @@ export default function PhysicsTextSandbox() {
           ctx.restore();
         });
 
-        // Draw cursor interaction ripple if hovering
+        // Draw cursor interaction ripple if hovering (compact, discreet)
         if (mPos.isHovering) {
           ctx.save();
           ctx.strokeStyle = 'rgba(225, 29, 39, 0.35)';
           ctx.lineWidth = 1;
           ctx.setLineDash([3, 3]);
           ctx.beginPath();
-          ctx.arc(mPos.x, mPos.y, 45, 0, Math.PI * 2);
+          ctx.arc(mPos.x, mPos.y, 20, 0, Math.PI * 2);
           ctx.stroke();
           ctx.restore();
         }

@@ -855,30 +855,6 @@ export default function About() {
             <ProjectGraphCanvas />
           </div>
         </div>
-
-        {/* ─── CHASSIS BOTTOM BAR ──────────────────────────────────── */}
-        <div className="border-t border-text-primary px-3 sm:px-6 py-2 flex items-center justify-between bg-bg-surface font-mono text-[9px] text-text-muted z-20">
-          <div className="flex items-center gap-3">
-            <span>+ CHANDIGARH / HISAR, IN</span>
-            <span className="hidden sm:inline">|</span>
-            <span className="hidden sm:inline">MERN STACK</span>
-            <span className="hidden md:inline">|</span>
-            <span className="hidden md:inline">AWS CERTIFIED</span>
-            <span className="hidden lg:inline">|</span>
-            <span className="hidden lg:inline">GITHUB: @Sheshank110</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <a
-              href="#dossier"
-              onClick={() => playCyberSfx(880, 'sine', 0.1, 0.04)}
-              className="font-mono text-[10px] font-bold text-accent hover:text-text-primary transition-colors flex items-center gap-1 uppercase"
-            >
-              <span>SECTION 03: DOSSIER</span>
-              <span>↓</span>
-            </a>
-          </div>
-        </div>
       </div>
     </section>
   );

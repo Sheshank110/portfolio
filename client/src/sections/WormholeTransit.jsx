@@ -246,51 +246,51 @@ export default function WormholeTransit() {
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -15, scale: 0.96 }}
                 transition={{ duration: 0.25 }}
-                className="pointer-events-auto max-w-xl w-full bg-black/85 border border-white/20 p-5 sm:p-6 rounded-xs shadow-[0_0_50px_rgba(255,255,255,0.06)] backdrop-blur-2xl relative overflow-hidden"
+                className="pointer-events-auto max-w-[420px] w-full bg-black/90 border border-white/20 p-3.5 sm:p-4 rounded-xs shadow-[0_0_30px_rgba(255,255,255,0.05)] backdrop-blur-xl relative overflow-hidden"
               >
                 {/* Clean top white accent line */}
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-white/60" />
+                <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-white/70" />
 
                 {/* Card Header: Gate pill + Category */}
-                <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px] font-bold px-2 py-0.5 uppercase tracking-wider rounded-xs bg-white text-black">
+                    <span className="font-mono text-[9px] font-bold px-1.5 py-0.5 uppercase tracking-wider rounded-xs bg-white text-black">
                       GATE {activeMilestone.gateIndex} // {activeMilestone.type}
                     </span>
-                    <span className="font-mono text-[10px] text-white/50 tracking-wider">
+                    <span className="font-mono text-[9px] text-white/50 tracking-wider">
                       {activeMilestone.badge}
                     </span>
                   </div>
 
-                  <span className="font-mono text-[11px] font-bold tracking-widest text-white/80">
+                  <span className="font-mono text-[10px] font-bold tracking-widest text-white/80">
                     {activeMilestone.year}
                   </span>
                 </div>
 
-                {/* Milestone Title */}
-                <h3 className="font-heading font-black text-lg sm:text-xl uppercase tracking-tight text-white mb-1">
+                {/* Milestone Title (compact) */}
+                <h3 className="font-heading font-black text-xs sm:text-sm uppercase tracking-tight text-white mb-1 leading-snug">
                   {activeMilestone.title}
                 </h3>
 
                 {/* Organization & Score */}
-                <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-white/70 font-medium mb-3">
+                <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-mono text-white/70 font-medium mb-2">
                   <span>▶ {activeMilestone.org}</span>
                   <span className="text-white/30">•</span>
                   <span className="text-white font-bold">{activeMilestone.score}</span>
                 </div>
 
-                {/* Description */}
-                <p className="text-xs text-neutral-300 leading-relaxed font-body mb-4">
+                {/* Description (compact) */}
+                <p className="text-[11px] text-neutral-300 leading-relaxed font-body mb-2.5 line-clamp-2 sm:line-clamp-3">
                   {activeMilestone.summary}
                 </p>
 
                 {/* Tags & Action Button */}
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-white/10">
-                  <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-white/10">
+                  <div className="flex flex-wrap gap-1">
                     {activeMilestone.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="text-[9px] font-mono px-2 py-0.5 bg-white/5 border border-white/10 rounded-xs text-white/70"
+                        className="text-[8px] font-mono px-1.5 py-0.5 bg-white/5 border border-white/10 rounded-xs text-white/70"
                       >
                         #{tag}
                       </span>
@@ -299,9 +299,9 @@ export default function WormholeTransit() {
 
                   <button
                     onClick={handleNextMilestone}
-                    className="font-mono text-[10px] font-bold uppercase tracking-wider px-3 py-1 bg-white text-black hover:bg-white/80 transition-all flex items-center gap-1.5 rounded-xs cursor-pointer ml-auto"
+                    className="font-mono text-[9px] font-bold uppercase tracking-wider px-2.5 py-0.5 bg-white text-black hover:bg-white/80 transition-all flex items-center gap-1 rounded-xs cursor-pointer ml-auto"
                   >
-                    <span>NEXT GATE</span>
+                    <span>NEXT</span>
                     <span>→</span>
                   </button>
                 </div>
