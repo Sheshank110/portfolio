@@ -5,9 +5,9 @@ import { useScrollProgress } from '../hooks/useScrollProgress';
 import portfolio from '../data/portfolio';
 
 const NAV_LINKS = [
-  { id: 'about', label: 'CORE // ABOUT' },
-  { id: 'dossier', label: 'DOSSIER' },
-  { id: 'transit', label: 'TRANSIT' },
+  { id: 'about', label: 'ABOUT' },
+  { id: 'dossier', label: 'PROJECTS' },
+  { id: 'transit', label: 'JOURNEY' },
   { id: 'contact', label: 'CONTACT' },
 ];
 

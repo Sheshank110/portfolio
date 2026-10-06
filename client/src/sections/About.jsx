@@ -838,7 +838,7 @@ export default function About() {
                 href="#dossier"
                 className="font-mono text-[10px] font-bold text-accent hover:text-text-primary transition-colors flex items-center gap-1.5 uppercase"
               >
-                <span>EXPLORE DOSSIER</span>
+                <span>EXPLORE PROJECTS</span>
                 <span>↓</span>
               </a>
               <a
