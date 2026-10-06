@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { motion, useSpring, useTransform } from 'framer-motion';
-import heroBg from '../assets/hero-crimson-bg.jpg';
-import portraitCutout from '../assets/sheshank-portrait-cutout.png';
+import heroImg from '../assets/sheshank-hero.png';
 
 // ── Floating Ember Sparks Canvas ──────────────────────────────────────────
 function EmberCanvas() {
@@ -92,7 +91,7 @@ function EmberCanvas() {
   return (
     <canvas
       ref={canvasRef}
-      className="absolute inset-0 w-full h-full pointer-events-none z-15"
+      className="absolute inset-0 w-full h-full pointer-events-none z-20"
       aria-hidden="true"
     />
   );
@@ -101,19 +100,15 @@ function EmberCanvas() {
 export default function Hero() {
   const containerRef = useRef(null);
 
-  // Parallax spring values for fluid mouse depth
-  const mouseX = useSpring(0, { stiffness: 100, damping: 22 });
-  const mouseY = useSpring(0, { stiffness: 100, damping: 22 });
+  // Parallax spring values for fluid mouse interaction
+  const mouseX = useSpring(0, { stiffness: 100, damping: 24 });
+  const mouseY = useSpring(0, { stiffness: 100, damping: 24 });
 
-  // Transform layers for stereoscopic depth
-  const bgTranslateX = useTransform(mouseX, [-1, 1], [-8, 8]);
-  const bgTranslateY = useTransform(mouseY, [-1, 1], [-5, 5]);
-
-  const textTranslateX = useTransform(mouseX, [-1, 1], [-12, 12]);
-  const textTranslateY = useTransform(mouseY, [-1, 1], [-7, 7]);
-
-  const personTranslateX = useTransform(mouseX, [-1, 1], [14, -14]);
-  const personTranslateY = useTransform(mouseY, [-1, 1], [8, -8]);
+  // 3D Tilt transforms
+  const rotateY = useTransform(mouseX, [-1, 1], [-3.5, 3.5]);
+  const rotateX = useTransform(mouseY, [-1, 1], [3, -3]);
+  const translateX = useTransform(mouseX, [-1, 1], [-8, 8]);
+  const translateY = useTransform(mouseY, [-1, 1], [-5, 5]);
 
   const handleMouseMove = (e) => {
     if (!containerRef.current) return;
@@ -129,9 +124,12 @@ export default function Hero() {
     mouseY.set(0);
   };
 
-  // Shared typography class string for pixel-perfect alignment
-  const nameTypographyClasses =
-    'font-black uppercase text-[18vw] sm:text-[16vw] md:text-[13.8vw] lg:text-[12.4vw] xl:text-[11.2rem] tracking-tight text-center leading-[0.84] select-none block';
+  // Anti-theft event blocker
+  const preventCopy = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  };
 
   return (
     <section
@@ -139,164 +137,86 @@ export default function Hero() {
       ref={containerRef}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      onContextMenu={(e) => e.preventDefault()}
-      className="relative w-full min-h-[640px] h-[92vh] md:h-screen bg-black overflow-hidden flex items-center justify-center select-none"
+      onContextMenu={preventCopy}
+      onDragStart={preventCopy}
+      style={{
+        userSelect: 'none',
+        WebkitUserSelect: 'none',
+        WebkitTouchCallout: 'none',
+      }}
+      className="relative w-full bg-black overflow-hidden flex items-center justify-center min-h-[580px] h-[92vh] md:h-screen select-none [perspective:1400px]"
     >
       {/* Accessible semantic heading for Search Engines & Screen Readers */}
       <h1 className="sr-only">
         Sheshank Gahlawat — Full-Stack Developer & Builder Portfolio
       </h1>
 
-      {/* ── Layer 1: Cinematic Crimson Background & Laser Flare ────────── */}
+      {/* ── 3D Interactive Motion Canvas Container ───────────────────── */}
       <motion.div
-        style={{ x: bgTranslateX, y: bgTranslateY }}
-        className="absolute inset-0 w-full h-full pointer-events-none"
+        style={{
+          rotateX,
+          rotateY,
+          x: translateX,
+          y: translateY,
+          transformStyle: 'preserve-3d',
+        }}
+        initial={{ opacity: 0, scale: 1.04 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+        className="relative w-full h-full flex items-center justify-center pointer-events-none"
       >
+        {/* Exact Original Landing Page Image (Unchanged) */}
         <img
-          src={heroBg}
-          alt=""
-          aria-hidden="true"
+          src={heroImg}
+          alt="Sheshank Gahlawat — Student, Developer, Builder"
           draggable={false}
-          className="w-full h-full object-cover object-center scale-105 pointer-events-none select-none"
+          onContextMenu={preventCopy}
+          onDragStart={preventCopy}
+          className="w-full h-full object-contain md:object-cover object-center block pointer-events-none select-none"
         />
 
-        {/* Central Anamorphic Red Laser Beam Overlay */}
+        {/* Dynamic Horizontal Laser Flare Glow (Synced with image beam) */}
         <div
-          className="absolute inset-0 pointer-events-none hero-laser-beam flex items-center justify-center opacity-85"
+          className="absolute inset-0 pointer-events-none hero-laser-beam flex items-center justify-center opacity-80 z-10"
           aria-hidden="true"
         >
-          <div className="w-full h-[2.5px] bg-gradient-to-r from-transparent via-[#ff2a4b] to-transparent shadow-[0_0_25px_#ff2a4b,0_0_55px_#e11d27]" />
+          <div className="w-full h-[2.5px] bg-gradient-to-r from-transparent via-[#ff2a4b]/80 to-transparent shadow-[0_0_25px_#ff2a4b,0_0_60px_#e11d27]" />
         </div>
 
-        {/* Ambient Red Glow Pulse */}
+        {/* Ambient Red Breathing Pulse */}
         <div
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] h-[45vh] bg-[#e11d27]/25 blur-[120px] rounded-full hero-ambient-glow pointer-events-none"
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60vw] h-[40vh] bg-[#e11d27]/20 blur-[120px] rounded-full hero-ambient-glow pointer-events-none z-10"
           aria-hidden="true"
         />
 
-        {/* Cinematic Vignette */}
+        {/* Floating Ember Particle System */}
+        <EmberCanvas />
+
+        {/* Cinematic Vignette Overlay */}
         <div
-          className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(0,0,0,0.5)_65%,rgba(0,0,0,0.95)_100%)]"
+          className="absolute inset-0 pointer-events-none bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(0,0,0,0.4)_70%,rgba(0,0,0,0.85)_100%)] z-22"
           aria-hidden="true"
         />
 
-        {/* Top & Bottom gradient blending into site */}
+        {/* Top & Bottom seamless gradient blending */}
         <div
-          className="absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-black/80 to-transparent pointer-events-none"
+          className="absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-black/85 via-black/40 to-transparent pointer-events-none z-25"
           aria-hidden="true"
         />
         <div
-          className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none"
+          className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black via-black/80 to-transparent pointer-events-none z-25"
           aria-hidden="true"
         />
       </motion.div>
 
-      {/* ── Layer 2: Particle Ember Canvas ────────────────────────────── */}
-      <EmberCanvas />
-
-      {/* ── Layer 3: Left Accent Typography (Desktop) ─────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, x: -25 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.9, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute left-6 md:left-10 lg:left-16 top-1/2 -translate-y-1/2 z-30 hidden md:block pointer-events-none"
-      >
-        <div className="font-mono text-[11px] lg:text-xs tracking-[0.26em] text-white/55 uppercase font-medium">
-          <span>IDEAS</span>
-          <span className="text-accent font-bold mx-2">/</span>
-          <span>BUILD</span>
-          <span className="text-accent font-bold mx-2">/</span>
-          <span>LEARN</span>
-          <span className="text-accent font-bold mx-2">/</span>
-          <span>REPEAT</span>
-        </div>
-      </motion.div>
-
-      {/* ── Layer 4: Right Accent Typography (Desktop) ────────────────── */}
-      <motion.div
-        initial={{ opacity: 0, x: 25 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.9, delay: 0.25, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute right-6 md:right-10 lg:right-16 top-1/2 -translate-y-1/2 z-30 hidden md:flex flex-col items-start gap-1 pointer-events-none"
-      >
-        <div className="flex flex-col items-start gap-1 font-mono text-[11px] lg:text-xs tracking-[0.24em] text-white/75 uppercase font-semibold">
-          <span>STUDENT</span>
-          <span>DEVELOPER</span>
-          <span>BUILDER</span>
-          <div className="w-6 h-[2px] bg-accent mt-1.5" />
-        </div>
-      </motion.div>
-
-      {/* ── Layer 5A: Behind Subject — Solid White "SHESHANK" ─────────── */}
-      <motion.div
-        style={{ x: textTranslateX, y: textTranslateY }}
-        initial={{ opacity: 0, y: 25, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.95, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10 px-4"
-      >
-        <span className={`hero-name-solid ${nameTypographyClasses}`} aria-hidden="true">
-          SHESHANK
-        </span>
-        {/* Invisible spacer keeping identical height and line spacing as GAHLAWAT */}
-        <span className={`invisible select-none pointer-events-none ${nameTypographyClasses}`} aria-hidden="true">
-          GAHLAWAT
-        </span>
-      </motion.div>
-
-      {/* ── Layer 5B: Foreground Subject — Sheshank Cutout ───────────── */}
-      <motion.div
-        style={{ x: personTranslateX, y: personTranslateY }}
-        initial={{ opacity: 0, scale: 0.96, y: 35 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ duration: 1.05, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute bottom-0 inset-x-0 flex justify-center items-end pointer-events-none z-20 h-[74vh] sm:h-[80vh] md:h-[85vh] lg:h-[88vh]"
-      >
-        <img
-          src={portraitCutout}
-          alt="Sheshank Gahlawat Portrait"
-          draggable={false}
-          onContextMenu={(e) => e.preventDefault()}
-          className="h-full w-auto max-w-[90vw] sm:max-w-[480px] md:max-w-[560px] lg:max-w-[650px] xl:max-w-[700px] object-contain object-bottom block select-none pointer-events-none drop-shadow-[0_15px_35px_rgba(0,0,0,0.85)] [mask-image:linear-gradient(to_bottom,black_68%,transparent_98%)] [-webkit-mask-image:linear-gradient(to_bottom,black_68%,transparent_98%)]"
-        />
-      </motion.div>
-
-      {/* ── Layer 5C: Across Subject's Chest — Outlined Red "GAHLAWAT" ── */}
-      <motion.div
-        style={{ x: textTranslateX, y: textTranslateY }}
-        initial={{ opacity: 0, y: 25, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.95, delay: 0.18, ease: [0.16, 1, 0.3, 1] }}
-        className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-25 px-4"
-      >
-        {/* Invisible spacer keeping identical height and line spacing as SHESHANK */}
-        <span className={`invisible select-none pointer-events-none ${nameTypographyClasses}`} aria-hidden="true">
-          SHESHANK
-        </span>
-        <span className={`hero-name-stroke ${nameTypographyClasses}`} aria-hidden="true">
-          GAHLAWAT
-        </span>
-      </motion.div>
-
-      {/* ── Layer 6: Mobile Editorial Accents (Bottom Bar) ───────────── */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.35 }}
-        className="md:hidden absolute bottom-5 inset-x-6 z-30 flex items-center justify-between text-[10px] font-mono tracking-widest text-white/60 uppercase pointer-events-none"
-      >
-        <div className="flex items-center gap-1.5">
-          <span>IDEAS</span>
-          <span className="text-accent">/</span>
-          <span>BUILD</span>
-          <span className="text-accent">/</span>
-          <span>LEARN</span>
-        </div>
-        <div className="flex items-center gap-2 text-right text-white/80 font-bold">
-          <span>BUILDER</span>
-          <div className="w-3.5 h-[2px] bg-accent" />
-        </div>
-      </motion.div>
+      {/* ── Transparent Interactive Anti-Theft Shield ─────────────────── */}
+      {/* Sits over the entire hero, intercepts right-clicks, drag-and-drops, and touch-saves */}
+      <div
+        onContextMenu={preventCopy}
+        onDragStart={preventCopy}
+        className="absolute inset-0 z-30 pointer-events-auto cursor-default"
+        aria-hidden="true"
+      />
     </section>
   );
 }
