@@ -522,10 +522,12 @@ export default function DeformedOrbDossier() {
     scene.add(new THREE.Points(geom, shaderMat));
 
     // ─── Render Loop ─────────────────────────────────────────────
+    let isVisible = true;
     let animId;
     const clock = new THREE.Clock();
 
     const render = () => {
+      if (!isVisible) return;
       animId = requestAnimationFrame(render);
       const t = clock.getElapsedTime();
 
@@ -546,7 +548,21 @@ export default function DeformedOrbDossier() {
 
       renderer.render(scene, camera);
     };
-    render();
+
+    // Pause heavy 500k particle loop when offscreen to avoid scroll lag
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        if (isVisible) {
+          cancelAnimationFrame(animId);
+          render();
+        } else {
+          cancelAnimationFrame(animId);
+        }
+      },
+      { threshold: 0.02 }
+    );
+    visibilityObserver.observe(container);
 
     // ─── Resize Handler ──────────────────────────────────────────
     const onResize = () => {
@@ -561,6 +577,7 @@ export default function DeformedOrbDossier() {
     obs.observe(container);
 
     return () => {
+      visibilityObserver.disconnect();
       cancelAnimationFrame(animId);
       obs.disconnect();
       if (renderer.domElement && container.contains(renderer.domElement)) {

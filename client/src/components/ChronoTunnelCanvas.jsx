@@ -385,10 +385,14 @@ export default function ChronoTunnelCanvas({
     window.addEventListener('resize', handleResize);
 
     // ─── 7. Continuous Ultra-Smooth Animation Loop ──────────────────────────
+    let isVisible = true;
     let animationFrameId;
     const clock = new THREE.Clock();
+    let lastWarpEmitTime = 0;
+    let lastEmittedWarp = 1.0;
 
     const render = () => {
+      if (!isVisible) return;
       animationFrameId = requestAnimationFrame(render);
       const elapsedTime = clock.getElapsedTime();
 
@@ -408,8 +412,14 @@ export default function ChronoTunnelCanvas({
       lastZ = cameraZ;
       warpFactor += (speed * 0.35 + 1.0 - warpFactor) * 0.08;
 
-      if (onWarpSpeedChangeRef.current) {
-        onWarpSpeedChangeRef.current(Math.min(warpFactor, 9.9));
+      // Throttle warp speed updates to prevent React re-render thrashing
+      const now = performance.now();
+      if (now - lastWarpEmitTime > 150 && Math.abs(warpFactor - lastEmittedWarp) > 0.15) {
+        lastWarpEmitTime = now;
+        lastEmittedWarp = warpFactor;
+        if (onWarpSpeedChangeRef.current) {
+          onWarpSpeedChangeRef.current(Math.min(warpFactor, 9.9));
+        }
       }
 
       // Camera position
@@ -478,10 +488,24 @@ export default function ChronoTunnelCanvas({
       renderer.render(scene, camera);
     };
 
-    render();
+    // Pause rendering when offscreen to ensure silky smooth scrolling
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        if (isVisible) {
+          cancelAnimationFrame(animationFrameId);
+          render();
+        } else {
+          cancelAnimationFrame(animationFrameId);
+        }
+      },
+      { threshold: 0.02 }
+    );
+    visibilityObserver.observe(container);
 
     // ─── Cleanup on Unmount Only ────────────────────────────────────────────
     return () => {
+      visibilityObserver.disconnect();
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('resize', handleResize);

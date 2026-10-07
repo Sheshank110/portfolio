@@ -273,7 +273,9 @@ export default function PhysicsTextSandbox() {
           ctx.restore();
         }
 
-        animId = requestAnimationFrame(renderLoop);
+        if (isVisible) {
+          animId = requestAnimationFrame(renderLoop);
+        }
       };
 
       if (!animId) {
@@ -281,14 +283,36 @@ export default function PhysicsTextSandbox() {
       }
     };
 
+    let isVisible = true;
+    const visibilityObserver = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+        if (isVisible) {
+          if (runnerRef.current && engineRef.current) {
+            Runner.run(runnerRef.current, engineRef.current);
+          }
+          cancelAnimationFrame(animId);
+          setupScene();
+        } else {
+          cancelAnimationFrame(animId);
+          if (runnerRef.current) {
+            Runner.stop(runnerRef.current);
+          }
+        }
+      },
+      { threshold: 0.02 }
+    );
+    visibilityObserver.observe(container);
+
     setupScene();
 
     const resizeObserver = new ResizeObserver(() => {
-      setupScene();
+      if (isVisible) setupScene();
     });
     resizeObserver.observe(container);
 
     return () => {
+      visibilityObserver.disconnect();
       cancelAnimationFrame(animId);
       resizeObserver.disconnect();
       if (runnerRef.current) Runner.stop(runnerRef.current);

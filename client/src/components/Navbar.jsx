@@ -1,7 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useActiveSection } from '../hooks/useActiveSection';
-import { useScrollProgress } from '../hooks/useScrollProgress';
 import portfolio from '../data/portfolio';
 
 const NAV_LINKS = [
@@ -18,16 +17,50 @@ export default function Navbar() {
   const [isOverHero, setIsOverHero] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
   const activeSection = useActiveSection(SECTION_IDS);
-  const scrollProgress = useScrollProgress();
+  const progressBarRef = useRef(null);
+
+  // Directly update progress bar style without triggering React component re-renders
+  useEffect(() => {
+    let ticking = false;
+    const updateProgress = () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          if (progressBarRef.current) {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const p = docHeight > 0 ? Math.min(1, Math.max(0, scrollTop / docHeight)) : 0;
+            progressBarRef.current.style.transform = `scaleX(${p})`;
+          }
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+    return () => window.removeEventListener('scroll', updateProgress);
+  }, []);
 
   useEffect(() => {
+    let lastOverHero = true;
+    let lastScrolled = false;
+
     const handleScroll = () => {
       const hero = document.getElementById('home');
       const heroBottom = hero ? hero.offsetTop + hero.offsetHeight : window.innerHeight;
       const scrollY = window.scrollY;
 
-      setIsOverHero(scrollY < heroBottom - 80);
-      setScrolled(scrollY > 40);
+      const newIsOverHero = scrollY < heroBottom - 80;
+      const newScrolled = scrollY > 40;
+
+      if (newIsOverHero !== lastOverHero) {
+        lastOverHero = newIsOverHero;
+        setIsOverHero(newIsOverHero);
+      }
+      if (newScrolled !== lastScrolled) {
+        lastScrolled = newScrolled;
+        setScrolled(newScrolled);
+      }
     };
 
     handleScroll();
@@ -61,10 +94,11 @@ export default function Navbar() {
 
   return (
     <>
-      {/* Scroll progress bar */}
+      {/* Scroll progress bar (DOM transform driven directly for 120fps smoothness) */}
       <div
+        ref={progressBarRef}
         className="scroll-progress"
-        style={{ transform: `scaleX(${scrollProgress})` }}
+        style={{ transform: 'scaleX(0)' }}
         aria-hidden="true"
       />
 
