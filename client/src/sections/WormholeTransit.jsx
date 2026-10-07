@@ -165,11 +165,11 @@ export default function WormholeTransit() {
             </span>
             <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
               <span className="text-white font-bold tracking-[0.25em] uppercase text-[11px]">
-                SPACE TRANSIT // CHRONO-VOYAGE
+                SPACE JOURNEY // CAREER TIMELINE
               </span>
               <span className="text-white/30 hidden sm:inline">•</span>
               <span className="text-white/60 font-medium hidden sm:inline">
-                DEEP VOID CORRIDOR
+                CHRONOLOGICAL PATH
               </span>
             </div>
           </div>
@@ -177,7 +177,7 @@ export default function WormholeTransit() {
           <div className="flex items-center gap-3 sm:gap-6">
             {/* Warp Velocity */}
             <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-2.5 py-1 rounded-xs">
-              <span className="text-white/40 text-[9px] uppercase hidden md:inline">DRIVE:</span>
+              <span className="text-white/40 text-[9px] uppercase hidden md:inline">SPEED:</span>
               <span className="text-white font-bold">
                 WARP {warpFactor.toFixed(1)}
               </span>
@@ -185,7 +185,7 @@ export default function WormholeTransit() {
 
             {/* Depth % Indicator */}
             <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-2.5 py-1 rounded-xs">
-              <span className="text-white/40 text-[9px] uppercase hidden md:inline">TRANSIT:</span>
+              <span className="text-white/40 text-[9px] uppercase hidden md:inline">PROGRESS:</span>
               <span className="text-white font-bold font-mono">
                 {Math.round(scrollProgress * 100)}%
               </span>

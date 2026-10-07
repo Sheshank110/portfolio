@@ -35,9 +35,10 @@ export default function PhysicsTextSandbox() {
     const canvas = canvasRef.current;
     if (!container || !canvas) return;
 
-    let animId;
+    let animId = null;
     let isVisible = true;
     let ground, leftWall, rightWall, ceiling;
+    let ctx = null;
 
     // Create Matter Engine with soft low-gravity so words float and juggle nicely
     const engine = Engine.create({
@@ -45,20 +46,32 @@ export default function PhysicsTextSandbox() {
     });
     engineRef.current = engine;
 
-    const setupScene = () => {
+    const wallThickness = 300;
+    const wallOptions = { isStatic: true, restitution: 0.9, friction: 0.05 };
+
+    const updateCanvasDimensions = () => {
       const width = container.clientWidth || 320;
       const height = container.clientHeight || 200;
-
-      // High-DPI Canvas Setup
       const dpr = window.devicePixelRatio || 1;
       canvas.width = width * dpr;
       canvas.height = height * dpr;
-      const ctx = canvas.getContext('2d');
-      ctx.scale(dpr, dpr);
+      ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      // Thick Static Boundaries surrounding the canvas (never let bodies escape)
-      const wallThickness = 300;
-      const wallOptions = { isStatic: true, restitution: 0.9, friction: 0.05 };
+      if (ground) {
+        Body.setPosition(ground, { x: width / 2, y: height + wallThickness / 2 });
+        Body.setPosition(rightWall, { x: width + wallThickness / 2, y: height / 2 });
+        Body.setPosition(leftWall, { x: -wallThickness / 2, y: height / 2 });
+        Body.setPosition(ceiling, { x: width / 2, y: -wallThickness / 2 });
+      }
+    };
+
+    const setupScene = () => {
+      const width = container.clientWidth || 320;
+      const height = container.clientHeight || 200;
+      const dpr = window.devicePixelRatio || 1;
+
+      updateCanvasDimensions();
 
       if (!ground) {
         ground = Bodies.rectangle(width / 2, height + wallThickness / 2, width * 3, wallThickness, wallOptions);
@@ -68,7 +81,7 @@ export default function PhysicsTextSandbox() {
 
         Composite.add(engine.world, [ground, leftWall, rightWall, ceiling]);
 
-        // Create Word Rigid Bodies SPAWNED DIRECTLY INSIDE THE VIEWPORT!
+        // Create Word Rigid Bodies SPAWNED DIRECTLY INSIDE THE VIEWPORT
         ctx.font = 'bold 10px "Space Grotesk", sans-serif';
         const bodies = [];
 
@@ -101,7 +114,6 @@ export default function PhysicsTextSandbox() {
           body.boxH = h;
           body.seed = idx;
 
-          // Give initial gentle velocity
           Body.setVelocity(body, {
             x: (Math.random() - 0.5) * 1.5,
             y: (Math.random() - 0.5) * 1.2,
@@ -131,159 +143,157 @@ export default function PhysicsTextSandbox() {
         const runner = Runner.create();
         runnerRef.current = runner;
         Runner.run(runner, engine);
-      } else {
-        // Update boundary positions on resize
-        Body.setPosition(ground, { x: width / 2, y: height + wallThickness / 2 });
-        Body.setPosition(rightWall, { x: width + wallThickness / 2, y: height / 2 });
-        Body.setPosition(leftWall, { x: -wallThickness / 2, y: height / 2 });
-        Body.setPosition(ceiling, { x: width / 2, y: -wallThickness / 2 });
-      }
-
-      // Main Render & Autonomous Kinetic Loop
-      let lastPulseTime = Date.now();
-
-      const renderLoop = () => {
-        const curW = container.clientWidth || 320;
-        const curH = container.clientHeight || 200;
-        const now = Date.now();
-
-        ctx.clearRect(0, 0, curW, curH);
-
-        // Cybercore Blueprint Grid
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.038)';
-        ctx.lineWidth = 1;
-        for (let x = 20; x < curW; x += 20) {
-          ctx.beginPath();
-          ctx.moveTo(x, 0);
-          ctx.lineTo(x, curH);
-          ctx.stroke();
-        }
-        for (let y = 20; y < curH; y += 20) {
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(curW, y);
-          ctx.stroke();
-        }
-
-        const isUserActive = now - lastUserInteractionRef.current < 2000;
-        const mPos = mousePosRef.current;
-
-        // Autonomous Juggler / Continuous Attention Grabber
-        const timeSec = now * 0.0015;
-
-        // Periodic gentle upward toss every 3.2 seconds if idle
-        if (!isUserActive && now - lastPulseTime > 3200) {
-          lastPulseTime = now;
-          wordBodiesRef.current.forEach((b) => {
-            Body.applyForce(b, b.position, {
-              x: (Math.random() - 0.5) * 0.008,
-              y: -0.012 - Math.random() * 0.008,
-            });
-          });
-        }
-
-        // Apply forces & strict boundary clamping to every word
-        wordBodiesRef.current.forEach((b, i) => {
-          const bw = b.boxW || 50;
-          const bh = b.boxH || 24;
-
-          // 1. Autonomous fluid wave if user is idle
-          if (!isUserActive) {
-            const waveX = Math.sin(timeSec + i * 0.8) * 0.00035;
-            const waveY = Math.cos(timeSec * 0.7 + i * 0.5) * 0.0003;
-            Body.applyForce(b, b.position, { x: waveX, y: waveY });
-          }
-
-          // 2. Cursor magnetic repulsion / interaction (effortless: just moving cursor moves words)
-          if (mPos.isHovering) {
-            const dx = b.position.x - mPos.x;
-            const dy = b.position.y - mPos.y;
-            const dist = Math.hypot(dx, dy);
-            const repelRadius = 40;
-
-            if (dist < repelRadius && dist > 1) {
-              const force = (1 - dist / repelRadius) * 0.0035;
-              Body.applyForce(b, b.position, {
-                x: (dx / dist) * force,
-                y: (dy / dist) * force,
-              });
-            }
-          }
-
-          // 3. Strict Boundary Clamping: mathematically impossible for any word to escape!
-          const padX = bw / 2 + 2;
-          const padY = bh / 2 + 2;
-
-          if (b.position.x < padX) {
-            Body.setPosition(b, { x: padX, y: b.position.y });
-            Body.setVelocity(b, { x: Math.abs(b.velocity.x) * 0.85, y: b.velocity.y });
-          } else if (b.position.x > curW - padX) {
-            Body.setPosition(b, { x: curW - padX, y: b.position.y });
-            Body.setVelocity(b, { x: -Math.abs(b.velocity.x) * 0.85, y: b.velocity.y });
-          }
-
-          if (b.position.y < padY) {
-            Body.setPosition(b, { x: b.position.x, y: padY });
-            Body.setVelocity(b, { x: b.velocity.x, y: Math.abs(b.velocity.y) * 0.85 });
-          } else if (b.position.y > curH - padY) {
-            Body.setPosition(b, { x: b.position.x, y: curH - padY });
-            Body.setVelocity(b, { x: b.velocity.x, y: -Math.abs(b.velocity.y) * 0.85 });
-          }
-
-          // 4. Render word pill
-          ctx.save();
-          ctx.translate(b.position.x, b.position.y);
-          ctx.rotate(b.angle);
-
-          // Shadow for depth
-          ctx.shadowColor = 'rgba(0, 0, 0, 0.12)';
-          ctx.shadowBlur = 4;
-          ctx.shadowOffsetY = 2;
-
-          // Box
-          ctx.fillStyle = b.customBg || '#ffffff';
-          ctx.strokeStyle = b.customBorder || '#0c0c0c';
-          ctx.lineWidth = b.customBg === '#e11d27' ? 1.5 : 1;
-          ctx.beginPath();
-          ctx.roundRect(-bw / 2, -bh / 2, bw, bh, 4);
-          ctx.fill();
-          ctx.stroke();
-
-          // Reset shadow for crisp text
-          ctx.shadowColor = 'transparent';
-
-          // Text
-          ctx.fillStyle = b.customColor || '#0c0c0c';
-          ctx.font = 'bold 9.5px "Space Grotesk", sans-serif';
-          ctx.textAlign = 'center';
-          ctx.textBaseline = 'middle';
-          ctx.fillText(b.customLabel, 0, 1);
-
-          ctx.restore();
-        });
-
-        // Draw cursor interaction ripple if hovering (compact, discreet)
-        if (mPos.isHovering) {
-          ctx.save();
-          ctx.strokeStyle = 'rgba(225, 29, 39, 0.35)';
-          ctx.lineWidth = 1;
-          ctx.setLineDash([3, 3]);
-          ctx.beginPath();
-          ctx.arc(mPos.x, mPos.y, 20, 0, Math.PI * 2);
-          ctx.stroke();
-          ctx.restore();
-        }
-
-        if (isVisible) {
-          animId = requestAnimationFrame(renderLoop);
-        }
-      };
-
-      if (!animId) {
-        animId = requestAnimationFrame(renderLoop);
       }
     };
- 
+
+    // Main Render & Autonomous Kinetic Frame
+    let lastPulseTime = Date.now();
+
+    const renderFrame = () => {
+      if (!ctx) return;
+      const curW = container.clientWidth || 320;
+      const curH = container.clientHeight || 200;
+      const now = Date.now();
+
+      ctx.clearRect(0, 0, curW, curH);
+
+      // Cybercore Blueprint Grid
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.038)';
+      ctx.lineWidth = 1;
+      for (let x = 20; x < curW; x += 20) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, curH);
+        ctx.stroke();
+      }
+      for (let y = 20; y < curH; y += 20) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(curW, y);
+        ctx.stroke();
+      }
+
+      const isUserActive = now - lastUserInteractionRef.current < 2000;
+      const mPos = mousePosRef.current;
+      const timeSec = now * 0.0015;
+
+      // Periodic gentle upward toss every 3.2 seconds if idle
+      if (!isUserActive && now - lastPulseTime > 3200) {
+        lastPulseTime = now;
+        wordBodiesRef.current.forEach((b) => {
+          Body.applyForce(b, b.position, {
+            x: (Math.random() - 0.5) * 0.008,
+            y: -0.012 - Math.random() * 0.008,
+          });
+        });
+      }
+
+      // Apply forces & strict boundary clamping to every word
+      wordBodiesRef.current.forEach((b, i) => {
+        const bw = b.boxW || 50;
+        const bh = b.boxH || 24;
+
+        // 1. Autonomous fluid wave if user is idle
+        if (!isUserActive) {
+          const waveX = Math.sin(timeSec + i * 0.8) * 0.00035;
+          const waveY = Math.cos(timeSec * 0.7 + i * 0.5) * 0.0003;
+          Body.applyForce(b, b.position, { x: waveX, y: waveY });
+        }
+
+        // 2. Cursor magnetic repulsion
+        if (mPos.isHovering) {
+          const dx = b.position.x - mPos.x;
+          const dy = b.position.y - mPos.y;
+          const dist = Math.hypot(dx, dy);
+          const repelRadius = 40;
+
+          if (dist < repelRadius && dist > 1) {
+            const force = (1 - dist / repelRadius) * 0.0035;
+            Body.applyForce(b, b.position, {
+              x: (dx / dist) * force,
+              y: (dy / dist) * force,
+            });
+          }
+        }
+
+        // 3. Strict Boundary Clamping: keep all words inside container
+        const padX = bw / 2 + 2;
+        const padY = bh / 2 + 2;
+
+        if (b.position.x < padX) {
+          Body.setPosition(b, { x: padX, y: b.position.y });
+          Body.setVelocity(b, { x: Math.abs(b.velocity.x) * 0.85, y: b.velocity.y });
+        } else if (b.position.x > curW - padX) {
+          Body.setPosition(b, { x: curW - padX, y: b.position.y });
+          Body.setVelocity(b, { x: -Math.abs(b.velocity.x) * 0.85, y: b.velocity.y });
+        }
+
+        if (b.position.y < padY) {
+          Body.setPosition(b, { x: b.position.x, y: padY });
+          Body.setVelocity(b, { x: b.velocity.x, y: Math.abs(b.velocity.y) * 0.85 });
+        } else if (b.position.y > curH - padY) {
+          Body.setPosition(b, { x: b.position.x, y: curH - padY });
+          Body.setVelocity(b, { x: b.velocity.x, y: -Math.abs(b.velocity.y) * 0.85 });
+        }
+
+        // 4. Render word pill
+        ctx.save();
+        ctx.translate(b.position.x, b.position.y);
+        ctx.rotate(b.angle);
+
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.12)';
+        ctx.shadowBlur = 4;
+        ctx.shadowOffsetY = 2;
+
+        ctx.fillStyle = b.customBg || '#ffffff';
+        ctx.strokeStyle = b.customBorder || '#0c0c0c';
+        ctx.lineWidth = b.customBg === '#e11d27' ? 1.5 : 1;
+        ctx.beginPath();
+        ctx.roundRect(-bw / 2, -bh / 2, bw, bh, 4);
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.shadowColor = 'transparent';
+
+        ctx.fillStyle = b.customColor || '#0c0c0c';
+        ctx.font = 'bold 9.5px "Space Grotesk", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(b.customLabel, 0, 1);
+
+        ctx.restore();
+      });
+
+      // Draw cursor interaction ripple if hovering
+      if (mPos.isHovering) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(225, 29, 39, 0.35)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.beginPath();
+        ctx.arc(mPos.x, mPos.y, 20, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+    };
+
+    const startLoop = () => {
+      if (animId) cancelAnimationFrame(animId);
+      const loop = () => {
+        if (!isVisible) return;
+        renderFrame();
+        animId = requestAnimationFrame(loop);
+      };
+      animId = requestAnimationFrame(loop);
+    };
+
+    const stopLoop = () => {
+      if (animId) {
+        cancelAnimationFrame(animId);
+        animId = null;
+      }
+    };
+
     const visibilityObserver = new IntersectionObserver(
       ([entry]) => {
         isVisible = entry.isIntersecting;
@@ -291,10 +301,9 @@ export default function PhysicsTextSandbox() {
           if (runnerRef.current && engineRef.current) {
             Runner.run(runnerRef.current, engineRef.current);
           }
-          cancelAnimationFrame(animId);
-          setupScene();
+          startLoop();
         } else {
-          cancelAnimationFrame(animId);
+          stopLoop();
           if (runnerRef.current) {
             Runner.stop(runnerRef.current);
           }
@@ -305,15 +314,17 @@ export default function PhysicsTextSandbox() {
     visibilityObserver.observe(container);
 
     setupScene();
+    startLoop();
 
     const resizeObserver = new ResizeObserver(() => {
-      if (isVisible) setupScene();
+      updateCanvasDimensions();
+      if (isVisible) renderFrame();
     });
     resizeObserver.observe(container);
 
     return () => {
       visibilityObserver.disconnect();
-      cancelAnimationFrame(animId);
+      stopLoop();
       resizeObserver.disconnect();
       if (runnerRef.current) Runner.stop(runnerRef.current);
       if (engineRef.current) Engine.clear(engineRef.current);

@@ -758,25 +758,11 @@ export default function About() {
   return (
     <section
       id="about"
-      className="relative w-full h-screen min-h-[620px] max-h-[900px] bg-bg flex items-center justify-center p-2.5 sm:p-4 md:p-6 overflow-hidden select-none border-t border-border"
+      className="relative w-full h-screen min-h-[620px] max-h-[900px] bg-bg flex items-center justify-center p-2.5 sm:p-4 md:p-6 overflow-hidden select-none border-t border-border scroll-mt-16"
     >
       {/* ─── CYBERCORE CHASSIS CONSOLE ─────────────────────────────── */}
       <div className="relative w-full h-full max-w-[1360px] max-h-[850px] bg-bg-surface border-2 border-text-primary flex flex-col justify-between overflow-hidden shadow-2xl rounded-xs">
         
-        {/* Hardware Corner Crosshairs */}
-        <div className="absolute top-2 left-2 z-30 font-mono text-[9px] text-text-muted flex items-center gap-1">
-          <span className="inline-block w-2.5 h-2.5 border border-text-primary rounded-full flex items-center justify-center font-bold text-[7px]">
-            +
-          </span>
-          <span className="tracking-tighter">SEC-02 // CORE</span>
-        </div>
-        <div className="absolute top-2 right-2 z-30 font-mono text-[9px] text-text-muted flex items-center gap-1">
-          <span className="tracking-tighter">SPEC-2.4 // NODE</span>
-          <span className="inline-block w-2.5 h-2.5 border border-text-primary rounded-full flex items-center justify-center font-bold text-[7px]">
-            +
-          </span>
-        </div>
-
         {/* ─── CHASSIS TOP BAR ─────────────────────────────────────── */}
         <div className="border-b border-text-primary px-3 sm:px-6 py-2.5 flex items-center justify-between bg-bg-surface z-20">
           <div className="flex items-center gap-3">
@@ -784,7 +770,10 @@ export default function About() {
               <span className="px-1.5 py-0.5 bg-text-primary text-white text-[10px] font-mono font-bold">
                 02
               </span>
-              CORE // SPECIFICATION
+              ABOUT & ARCHITECTURE
+            </span>
+            <span className="hidden sm:inline font-mono text-[9px] text-text-muted">
+              // SPECIFICATION
             </span>
           </div>
 
