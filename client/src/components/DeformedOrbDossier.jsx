@@ -249,9 +249,38 @@ const blackHoleFragmentShader = `
   }
 `;
 
+const TECH_ORBIT_NODES = [
+  { id: 'mern', label: 'MERN STACK', desc: 'MongoDB, Express.js, React 19, Node.js Full-Stack Architecture', angle: 0 },
+  { id: 'react', label: 'REACT 19', desc: 'Modern State, Concurrent Rendering & Reactive UIs', angle: 60 },
+  { id: 'node', label: 'NODE.JS', desc: 'High-Throughput REST APIs, Microservices & Middleware', angle: 120 },
+  { id: 'dsa', label: 'C++ / DSA', desc: '500+ Algorithmic Problems Solved (Data Structures & Logic)', angle: 180 },
+  { id: 'sih', label: 'SIH WINNER', desc: 'Smart India Hackathon Govt of India National Laureate', angle: 240 },
+  { id: 'cloud', label: 'AWS CLOUD', desc: 'Cloud Computing, Docker Containerization & Distributed Systems', angle: 300 },
+];
+
+function playCyberBeep(freq = 740, type = 'sine', duration = 0.05, vol = 0.03) {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + duration);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  } catch (e) {}
+}
+
 export default function DeformedOrbDossier() {
   const mountRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [selectedTech, setSelectedTech] = useState(null);
+  const [isCoreOpen, setIsCoreOpen] = useState(false);
 
   const rendererRef = useRef(null);
   const inclinationRef = useRef(1.15); // Start at pleasant tilted angle
@@ -618,13 +647,13 @@ export default function DeformedOrbDossier() {
       {/* Top Telemetry HUD */}
       <div className="border-b border-neutral-900 bg-[#050507]/90 px-4 sm:px-6 py-2.5 flex items-center justify-between font-mono text-[10px] z-30 pointer-events-none">
         <div className="flex items-center gap-2 sm:gap-3">
-          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
           <span className="text-[10px] tracking-[0.22em] text-white uppercase font-bold">
-            BLACKHOLE SIMULATION
+            SINGULARITY // CORE DEVELOPER MATRIX
           </span>
           <span className="text-neutral-600 hidden sm:inline">|</span>
           <span className="text-neutral-400 text-[9px] hidden sm:inline tracking-wider">
-            RELATIVISTIC KERNEL: ACTIVE • METRIC: SCHWARZSCHILD / KERR
+            ARCHITECT CORE: ACTIVE • MERN + CLOUD
           </span>
         </div>
         <div className="flex items-center gap-2 sm:gap-4">
@@ -634,8 +663,8 @@ export default function DeformedOrbDossier() {
           <span className="text-neutral-500 text-[9px] hidden md:inline font-mono">
             PHOTON SPHERE: 1.50<span className="text-neutral-600">Rs</span>
           </span>
-          <span className="text-orange-400 text-[9px] font-bold tracking-wider">
-            LENSING: ACTIVE
+          <span className="text-red-400 text-[9px] font-bold tracking-wider">
+            CORE: STABLE
           </span>
           <span className="text-cyan-400 text-[9px] font-bold">
             500K PARTICLES
@@ -662,24 +691,163 @@ export default function DeformedOrbDossier() {
           <div className="w-full h-px bg-neutral-800 absolute" />
           <div className="h-full w-px bg-neutral-800 absolute" />
         </div>
+
+        {/* ─── HOLOGRAPHIC DEVELOPER CORE (EVENT HORIZON OVERLAY) ─────── */}
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
+          {/* Outer Orbital Tech Badges Ring */}
+          <div className="relative w-[340px] h-[340px] sm:w-[410px] sm:h-[410px] rounded-full border border-neutral-800/40 flex items-center justify-center animate-[spin_60s_linear_infinite]">
+            {TECH_ORBIT_NODES.map((node) => {
+              const rad = (node.angle * Math.PI) / 180;
+              const r = 165;
+              const x = Math.cos(rad) * r;
+              const y = Math.sin(rad) * r;
+              return (
+                <div
+                  key={node.id}
+                  style={{ transform: `translate(${x}px, ${y}px)` }}
+                  className="absolute pointer-events-auto"
+                >
+                  {/* Counter-rotate so badge stays upright while orbiting! */}
+                  <div className="animate-[spin_60s_linear_infinite_reverse]">
+                    <button
+                      onClick={() => {
+                        setSelectedTech(selectedTech?.id === node.id ? null : node);
+                        playCyberBeep(960);
+                      }}
+                      onMouseEnter={() => playCyberBeep(740)}
+                      className={`group px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full border backdrop-blur-md text-[8px] sm:text-[9px] font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xl shadow-black/90 hover:scale-105 ${
+                        selectedTech?.id === node.id
+                          ? 'border-red-500 bg-red-600/30 text-white shadow-red-500/20'
+                          : 'border-red-500/40 bg-black/85 text-white/90 hover:border-red-500 hover:text-white hover:bg-red-600/20'
+                      }`}
+                    >
+                      <span className="w-1.5 h-1.5 rounded-full bg-red-500 group-hover:animate-ping" />
+                      <span>{node.label}</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Central Singularity Hologram Emblem (Inside the Event Horizon Void) */}
+          <div className="absolute pointer-events-auto flex flex-col items-center justify-center">
+            {/* Glowing Core Rings */}
+            <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full border border-red-500/25 flex items-center justify-center relative">
+              <div className="absolute inset-0 rounded-full border border-dashed border-red-500/35 animate-[spin_24s_linear_infinite]" />
+              <div className="absolute w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-red-600/10 blur-xl animate-pulse" />
+
+              {/* Center Interactive Core Button */}
+              <button
+                onClick={() => {
+                  setIsCoreOpen(!isCoreOpen);
+                  playCyberBeep(520);
+                }}
+                onMouseEnter={() => playCyberBeep(640)}
+                className="group relative z-10 flex flex-col items-center justify-center text-center p-3 rounded-full hover:scale-105 transition-all cursor-pointer"
+                title="Click to view Core Intelligence Intel"
+              >
+                <div className="w-2 h-2 rounded-full bg-red-500 shadow-lg shadow-red-500 animate-ping mb-1" />
+                <span className="font-heading font-black text-[10px] sm:text-[11px] tracking-wider uppercase text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)] group-hover:text-red-400 transition-colors">
+                  SHESHANK DEV
+                </span>
+                <span className="font-mono text-[7px] sm:text-[8px] text-red-500/90 font-bold tracking-widest uppercase">
+                  // CORE ARCHITECT
+                </span>
+                <span className="font-mono text-[7px] text-neutral-400 mt-0.5 tracking-tighter opacity-70 group-hover:opacity-100">
+                  [ CLICK INTEL ]
+                </span>
+              </button>
+            </div>
+          </div>
+
+          {/* Active Skill Info Toast */}
+          {selectedTech && (
+            <div className="absolute bottom-5 pointer-events-auto z-40 bg-[#070709]/95 border border-red-500/50 backdrop-blur-md px-4 py-2 rounded-xs shadow-2xl flex items-center gap-3 animate-in fade-in zoom-in-95 duration-200">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              <div>
+                <span className="font-mono text-[10px] font-bold text-white uppercase tracking-wider block">
+                  {selectedTech.label}
+                </span>
+                <span className="font-mono text-[9px] text-neutral-400 block">
+                  {selectedTech.desc}
+                </span>
+              </div>
+              <button
+                onClick={() => setSelectedTech(null)}
+                className="text-neutral-500 hover:text-white font-mono text-xs ml-2 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          {/* Core Singularity Intel Modal Drawer */}
+          {isCoreOpen && (
+            <div className="absolute inset-x-4 sm:inset-x-auto sm:w-[420px] z-50 bg-[#070709]/95 border border-red-500/50 backdrop-blur-xl p-5 rounded-xs shadow-2xl pointer-events-auto animate-in fade-in zoom-in-95 duration-200 font-mono">
+              <div className="flex items-center justify-between border-b border-neutral-800 pb-2 mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+                  <span className="text-[11px] font-bold text-white tracking-widest uppercase">
+                    SINGULARITY // CORE INTEL
+                  </span>
+                </div>
+                <button
+                  onClick={() => setIsCoreOpen(false)}
+                  className="text-neutral-500 hover:text-white cursor-pointer text-xs"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-2.5 text-[10px]">
+                <div className="flex justify-between items-center py-1 border-b border-neutral-900">
+                  <span className="text-neutral-400">ENGINEERING ROLE:</span>
+                  <span className="text-white font-bold">FULL STACK MERN & ARCHITECTURE</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-neutral-900">
+                  <span className="text-neutral-400">SIH 2024 HONORS:</span>
+                  <span className="text-emerald-400 font-bold">SMART INDIA HACKATHON LAUREATE</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-neutral-900">
+                  <span className="text-neutral-400">ALGORITHMIC MASTERY:</span>
+                  <span className="text-white font-bold">500+ PROBLEMS SOLVED (C++/DSA)</span>
+                </div>
+                <div className="flex justify-between items-center py-1 border-b border-neutral-900">
+                  <span className="text-neutral-400">FLAGSHIP SYSTEMS:</span>
+                  <span className="text-red-400 font-bold">LIFE CARD • FITFLOW • AR HERITAGE</span>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-neutral-800 flex items-center justify-between">
+                <a
+                  href="#contact"
+                  onClick={() => setIsCoreOpen(false)}
+                  className="px-3 py-1 bg-red-600 text-white text-[9px] font-bold uppercase tracking-wider hover:bg-red-500 transition-colors cursor-pointer"
+                >
+                  CONNECT WITH SHESHANK →
+                </a>
+                <span className="text-[8px] text-neutral-500 tracking-tighter">
+                  STATUS: OPEN TO WORK
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Bottom Physics Telemetry */}
       <div className="border-t border-neutral-900 bg-[#050507]/90 px-3 sm:px-6 py-2 flex items-center justify-center gap-4 z-30 font-mono text-[9px] pointer-events-none">
-        <span className="text-neutral-500 tracking-wider uppercase">
+        <span className="text-neutral-400 tracking-wider uppercase">
           EVENT HORIZON: 1.00Rs
         </span>
         <span className="text-neutral-600">|</span>
-        <span className="text-neutral-500 tracking-wider uppercase">
-          PHOTON RING: 2.60Rs
+        <span className="text-neutral-400 tracking-wider uppercase">
+          DEVELOPER NEXUS: SHESHANK.DEV
         </span>
         <span className="text-neutral-600">|</span>
-        <span className="text-neutral-500 tracking-wider uppercase">
-          ISCO: 3.00Rs
-        </span>
-        <span className="text-neutral-600 hidden sm:inline">|</span>
-        <span className="text-neutral-500 tracking-wider uppercase hidden sm:inline">
-          NOVIKOV-THORNE SPECTRUM
+        <span className="text-red-400 tracking-wider uppercase font-bold">
+          DRAG TO ROTATE 3D ACCRETION DISK
         </span>
       </div>
     </div>
