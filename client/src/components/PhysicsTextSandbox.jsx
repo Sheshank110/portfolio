@@ -36,6 +36,7 @@ export default function PhysicsTextSandbox() {
     if (!container || !canvas) return;
 
     let animId;
+    let isVisible = true;
     let ground, leftWall, rightWall, ceiling;
 
     // Create Matter Engine with soft low-gravity so words float and juggle nicely
@@ -282,8 +283,7 @@ export default function PhysicsTextSandbox() {
         animId = requestAnimationFrame(renderLoop);
       }
     };
-
-    let isVisible = true;
+ 
     const visibilityObserver = new IntersectionObserver(
       ([entry]) => {
         isVisible = entry.isIntersecting;

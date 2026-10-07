@@ -17,6 +17,7 @@ export default function WormholeTransit() {
   // ─── Silky Smooth Scroll Progress Computation ────────────────────────────
   useEffect(() => {
     let lastProgress = -1;
+    let ticking = false;
     const handleScroll = () => {
       if (!ticking) {
         requestAnimationFrame(() => {
