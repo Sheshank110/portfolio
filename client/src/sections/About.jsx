@@ -758,7 +758,7 @@ export default function About() {
   return (
     <section
       id="about"
-      className="relative w-full h-screen min-h-[620px] max-h-[900px] bg-bg flex items-center justify-center p-2.5 sm:p-4 md:p-6 overflow-hidden select-none border-t border-border scroll-mt-16"
+      className="relative w-full h-screen min-h-[620px] max-h-[900px] bg-bg flex items-center justify-center p-2.5 sm:p-4 md:p-6 overflow-hidden select-none border-t border-border "
     >
       {/* ─── CYBERCORE CHASSIS CONSOLE ─────────────────────────────── */}
       <div className="relative w-full h-full max-w-[1360px] max-h-[850px] bg-bg-surface border-2 border-text-primary flex flex-col justify-between overflow-hidden shadow-2xl rounded-xs">

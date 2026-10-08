@@ -81,7 +81,7 @@ export default function App() {
             const targetEl = document.querySelector(targetId);
             if (targetEl && lenis) {
               e.preventDefault();
-              lenis.scrollTo(targetEl, { offset: -70, duration: 1.1 });
+              lenis.scrollTo(targetEl, { offset: 0, duration: 1.1 });
             }
           } catch (err) {
             console.warn('Anchor navigation error:', err);

@@ -137,7 +137,7 @@ export default function Contact() {
   const remaining = MAX_MESSAGE - formData.message.length;
 
   return (
-    <section id="contact" className="section-padding border-t border-border bg-bg scroll-mt-20">
+    <section id="contact" className="section-padding border-t border-border bg-bg ">
       <div className="section-container">
         {/* Growkool 06 Header */}
         <div className="flex items-center gap-4 mb-4">
