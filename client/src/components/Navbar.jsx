@@ -169,7 +169,7 @@ export default function Navbar() {
               className="btn-growkool-red"
             >
               <span>LET'S TALK</span>
-              <span className="text-sm font-mono font-bold">↗</span>
+              <span className="text-xs font-mono font-bold">↗</span>
             </a>
           </div>
 
