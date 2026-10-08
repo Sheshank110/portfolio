@@ -715,10 +715,10 @@ export default function DeformedOrbDossier() {
                         playCyberBeep(960);
                       }}
                       onMouseEnter={() => playCyberBeep(740)}
-                      className={`group px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full border backdrop-blur-md text-[8px] sm:text-[9px] font-mono font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xl shadow-black/90 hover:scale-105 ${
+                      className={`group px-2.5 sm:px-3 py-1 rounded-full border backdrop-blur-md text-[8.5px] sm:text-[9.5px] font-mono font-medium tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-xl shadow-black/90 hover:scale-105 ${
                         selectedTech?.id === node.id
-                          ? 'border-red-500 bg-red-600/30 text-white shadow-red-500/20'
-                          : 'border-red-500/40 bg-black/85 text-white/90 hover:border-red-500 hover:text-white hover:bg-red-600/20'
+                          ? 'border-white/40 bg-white/15 text-white shadow-white/5'
+                          : 'border-white/15 bg-black/85 text-neutral-200 hover:border-white/35 hover:text-white hover:bg-white/10'
                       }`}
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-red-500 group-hover:animate-ping" />
@@ -733,8 +733,8 @@ export default function DeformedOrbDossier() {
           {/* Central Singularity Hologram Emblem (Inside the Event Horizon Void) */}
           <div className="absolute pointer-events-auto flex flex-col items-center justify-center">
             {/* Glowing Core Rings */}
-            <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full border border-red-500/25 flex items-center justify-center relative">
-              <div className="absolute inset-0 rounded-full border border-dashed border-red-500/35 animate-[spin_24s_linear_infinite]" />
+            <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full border border-white/20 flex items-center justify-center relative">
+              <div className="absolute inset-0 rounded-full border border-dashed border-white/25 animate-[spin_24s_linear_infinite]" />
               <div className="absolute w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-red-600/10 blur-xl animate-pulse" />
 
               {/* Center Interactive Core Button */}
@@ -763,7 +763,7 @@ export default function DeformedOrbDossier() {
 
           {/* Active Skill Info Toast */}
           {selectedTech && (
-            <div className="absolute bottom-5 pointer-events-auto z-40 bg-[#070709]/95 border border-red-500/50 backdrop-blur-md px-4 py-2 rounded-xs shadow-2xl flex items-center gap-3 animate-in fade-in zoom-in-95 duration-200">
+            <div className="absolute bottom-5 pointer-events-auto z-40 bg-[#070709]/95 border border-white/20 backdrop-blur-md px-4 py-2 rounded-xs shadow-2xl flex items-center gap-3 animate-in fade-in zoom-in-95 duration-200">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
               <div>
                 <span className="font-mono text-[10px] font-bold text-white uppercase tracking-wider block">
@@ -784,7 +784,7 @@ export default function DeformedOrbDossier() {
 
           {/* Core Singularity Intel Modal Drawer */}
           {isCoreOpen && (
-            <div className="absolute inset-x-4 sm:inset-x-auto sm:w-[420px] z-50 bg-[#070709]/95 border border-red-500/50 backdrop-blur-xl p-5 rounded-xs shadow-2xl pointer-events-auto animate-in fade-in zoom-in-95 duration-200 font-mono">
+            <div className="absolute inset-x-4 sm:inset-x-auto sm:w-[420px] z-50 bg-[#070709]/95 border border-white/20 backdrop-blur-xl p-5 rounded-xs shadow-2xl pointer-events-auto animate-in fade-in zoom-in-95 duration-200 font-mono">
               <div className="flex items-center justify-between border-b border-neutral-800 pb-2 mb-3">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
